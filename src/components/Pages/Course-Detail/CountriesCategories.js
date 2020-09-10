@@ -20,7 +20,7 @@ const CourseCategory = (props) => {
               const  getCountriesCat = async(data) =>{
                   setLoader("true")
              
-                //   let comp = data;
+                
  
                    await fetch(`https://api.odmit.com/api/v1/category-course-count?qualification=${searchQul}&stream=${searchStream}&sub_stream=${searchSubStream}&course_type=${courseType}&country=${countryName}`)
                             .then((response)=>{

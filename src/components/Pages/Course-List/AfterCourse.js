@@ -1,83 +1,99 @@
 import React,{useState,useEffect} from 'react'
 import {Link} from 'react-router-dom'
 import Loader from '../../Loader/loader'
+// import Pagination from "react-js-paginate;
+import ReactPaginate from 'react-paginate';
 
-
+// require("bootstrap/less/bootstrap.less");
 
 
 
 
 
     const AfterCourse = (props) =>{
-        let {courseType,selectCountry,selectSubStream,selectQualification,selectCategory,selectStream}=props.history.location.state= undefined ? [] : props.history.location.state;
+        let {courseType,selectCountry,selectSubStream,selectQualification,selectCategory,selectStream}=props.history.location.state;
 
 
-	// show more information with the click of button
+// show more information with the click of button
 
 
-	const bigHeight=(bigOver)=>{
-	if(document.getElementById(bigOver).style.height='100px'){
+const bigHeight=(bigOver)=>{
+if(document.getElementById(bigOver).style.height='100px'){
 
-		document.getElementById(bigOver).style.height = '400px';
-	}
-	else
-	{
-		document.getElementById(bigOver).style.height='100px'
-	}
-	}
+document.getElementById(bigOver).style.height = '400px';
+}
+else
+{
+document.getElementById(bigOver).style.height='100px'
+}
+}
 
 
-	const [data,setResult] = useState([]);
+const [data,setResult] = useState([]);
     const [loader,setLoader] = useState([]);
     const [pageSecond,setPageSecond] =useState([]);
     const [onLineCourse,setOnlineCourse] = useState([]);
     const [pagesno,setPagesNo] = useState([]);
 
+// new pagination const
+    const [offset,setOffest] = useState(0);
+    const [perPage,setperPage] = useState(6);
+    const [currentPage,setcurrentPage] = useState(1);
+    const [postData,setpostData] = useState([])
+    const [pageCount,setpageCount] = useState()
+
           useEffect(()=>{
             getResult();
             getOnlineCourse();
-	        },[])
+       },[currentPage])
 
-	    const getResult = async() =>{
+   const getResult = async() =>{
             setLoader("true")
-            setResult(data)
-			  await fetch(`https://api.odmit.com/api/v1/institute-stack?qualification=${selectQualification}&stream=${selectStream}&substream=${selectSubStream}&course_type=${courseType}&country=${selectCountry}&category=${selectCategory}&page=1&limit=6&offset=0`)
-			   .then((response)=>{
-				   return response.json()
-			   })
-			   .then((res)=>{
-				   setResult(res.response.data)
-				   // console.log(res)
-            let pageNo = Math.round(res.response.total_record/6);
-            let countPage= [];
-            for(let i = 0; i<=pageNo;i++){
-              countPage.push(i)
-            }
-            console.log(countPage)
-            setPagesNo([...pagesno,...countPage])
-
-			   })
-			   .catch((err)=>{
-				console.log(err)
-               })
-			   .finally(()=>{
-				   setLoader("false")
-			   })
+            // setResult(data)
+            await fetch(`https://api.odmit.com/api/v1/institute-stack?qualification=${selectQualification}&stream=${selectStream}&substream=${selectSubStream}&course_type=${courseType}&country=${selectCountry}&category=${selectCategory}&page=${currentPage}&limit=6&offset=0`)
+           .then((response)=>{
+             return response.json()
+  })
+  .then((res)=>{
+  setResult(res.response.data)
+             const data = res.response.data;
+             const totalPages = res.response.total_record
+             const slice = data.slice(offset,offset + perPage)
+             let mypageCount = Math.ceil(totalPages / perPage)
+             console.log(res.response.data)
+             setpostData(slice)
+             setpageCount(mypageCount)
+  })
+  .catch((err)=>{
+       console.log(err)
+          })
+  .finally(()=>{
+  setLoader("false")
+  })
         }
-        const getResultPageSecond = async(myPageno) =>{
 
-                await fetch(`https://api.odmit.com/api/v1/institute-stack?qualification=${selectQualification}&stream=${selectStream}&substream=${selectSubStream}&course_type=${courseType}&country=${selectCountry}&category=${selectCategory}&page=${myPageno}&limit=6&offset=0`)
+      const handlePageClick = (e) => {
+        const selectedPage = e.selected + 1;
+        console.log(selectedPage)
+        const offset = selectedPage * perPage;
+        setOffest(offset)
+        setcurrentPage(selectedPage)
+  };
+
+        const getResultPageSecond = async() =>{
+                await fetch(`https://api.odmit.com/api/v1/institute-stack?qualification=${selectQualification}&stream=${selectStream}&substream=${selectSubStream}&course_type=${courseType}&country=${selectCountry}&category=${selectCategory}&page=${currentPage}&limit=6&offset=0`)
                        .then((response)=>{
                            return response.json()
                        })
                        .then((res)=>{
-                        //    console.log(res.response.data,"nexxxtttt page")
+                           console.log(res.response.data,"nexxxtttt page")
                            setResult(res.response.data)
                        })
                        .catch((err)=>{
                            console.log(err)
                        })
             }
+
             const getOnlineCourse = async(data) =>{
                 // setOnlineCourse(data)
                 await fetch(`https://api.odmit.com/api/v1/online-courses-list?qualification=${selectQualification}&page=1&limit=4&offset=0`)
@@ -85,32 +101,29 @@ import Loader from '../../Loader/loader'
                       return response.json()
                   })
                   .then((res)=>{
+                    //   console.log(res.response.data,"fetchhhhhhhhh")
                       setOnlineCourse(res.response.data)
                   })
 
             }
-             const getSuggestCourses = async () =>{
-                 await fetch(``)
-
-             }
 
 
-		// ADD CLASS to show  box shadow acc to course list
+// ADD CLASS to show  box shadow acc to course list
 
 
 
-			const addSh = (data) =>{
+const addSh = (data) =>{
 
-				if(data !== undefined && data.length > 1){
+if(data !== undefined && data.length > 1){
 
-					return "course-stack-card mycourse-sh";
+return "course-stack-card mycourse-sh";
 
-				}
-				else{
+}
+else{
 
-					return "course-stack-card";
-				}
-			}
+return "course-stack-card";
+}
+}
             return(
                 <div>
                     <Loader loader = {loader}/>
@@ -237,7 +250,7 @@ import Loader from '../../Loader/loader'
                                                 </div>
                                             </div>
 
-                                          
+                                      
 
                                         </div>
 
@@ -247,19 +260,29 @@ import Loader from '../../Loader/loader'
 
                                             })
                                         }
+                                        <ReactPaginate
+                  previousLabel={"prev"}
+                  nextLabel={"next"}
+                  breakLabel={"..."}
+                  breakClassName={"break-me"}
+                  pageCount={pageCount}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed={5}
+                  onPageChange={(e)=>handlePageClick(e)}
+                  containerClassName={"pagination"}
+                  subContainerClassName={"pages pagination"}
+                  activeClassName={"active"}/>
+
                                             <div className="pageCont" >
 
                                             {
                                               pagesno.map((v,i)=>{
                                                 return(
-                                                  <button  onClick = {()=>getResultPageSecond(i+1)}>{i+1}</button>
+                                                  <button onClick = {()=>getResultPageSecond(i+1)}>{i+1}</button>
                                                 )
-                                            
                                               })
-                                              
                                             }
-                                             
-                                       
+
 
                                           </div>
 
@@ -272,7 +295,7 @@ import Loader from '../../Loader/loader'
                                     </div>
                                     <div className="suggestion-block box-card">
                                         <h6>Suggestion For You</h6>
-                                       {
+                                    {/*    {
                                             pageSecond.map((v,i)=>{
                                                 return(
                                                     <div className="media" key={i}>
@@ -285,9 +308,26 @@ import Loader from '../../Loader/loader'
                                                 </div>
                                                 )
                                             })
-                                        }
+                                        } */}
 
-                                        
+                                        {/* <div className="media">
+                                            <img src="/assets/img/blog-img-2.png" className="img-fluid mr-3" alt="blog-img" width="120" height="120" />
+                                            <div className="media-body">
+                                                <h6>Aryan University</h6>
+                                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting text of the printing and typesetting .</p>
+                                                <Link to="/" className="site-link">Explore <i className="ri-add-line"></i></Link>
+                                            </div>
+                                        </div>
+                                        <div className="media">
+                                            <img src="/assets/img/blog-img-1.png" className="img-fluid mr-3" alt="blog-img" width="120" height="120" />
+                                            <div className="media-body">
+                                                <h6>Aryan University</h6>
+                                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting text of the printing and typesetting .</p>
+                                                <Link to="/" className="site-link">Explore <i className="ri-add-line"></i></Link>
+                                            </div>
+
+                                        </div>
+     */}
                                     </div>
 
                                 </div>
@@ -304,4 +344,5 @@ import Loader from '../../Loader/loader'
 
 
     export default AfterCourse;
+
 	

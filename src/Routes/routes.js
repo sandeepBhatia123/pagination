@@ -7,7 +7,7 @@ import CourseList from '../components/Pages/Course-List/course-list';
 import SelectCourse from '../components/Pages/Select-Course/select-course';
 import CourseCategory from '../components/Pages/Course-Detail/CountriesCategories'
 import AfterCourse from '../components/Pages/Course-List/AfterCourse'
-
+import PagiNation from './pagination'
 export default function IndexRoute() {
     return (
         <BrowserRouter>
@@ -19,7 +19,8 @@ export default function IndexRoute() {
                     <Route path ="/coursecat"  component={CourseCategory}/>
                    <Route path="/AfterCourse" component={AfterCourse}/>                   
                    <Route path="/SelectCourse" component= {SelectCourse} />
-                </Switch>
+                   <Route path ="/pagination" component={PagiNation}/>
+                                       </Switch>
             </main>
             <Footer />
         </BrowserRouter>
